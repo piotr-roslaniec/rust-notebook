@@ -1,0 +1,57 @@
+# Disabled because nbconvert doesn't know how to handle a Rust kernel
+
+#name: '🔎 Jupyter Tests'
+#
+#on:
+#  pull_request:
+#  push:
+#    branches:
+#      - main
+#
+#concurrency:
+#  group: ci-tests-${{ github.ref }}-jupyter
+#  cancel-in-progress: true
+#
+#jobs:
+#  jupyter-tests:
+#
+#    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        python-version: [ "3.10" ]
+#
+#    steps:
+#      - name: Checkout repo
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - id: setup_python
+#        name: Set up Python ${{ matrix.python-version }} Environment
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: ${{ matrix.python-version }}
+#
+#      - name: Install Pipenv
+#        run: pip install pipenv
+#
+#      - name: Install dependencies
+#        run: pipenv install --dev
+#
+#      - name: Install Rust
+#        run: |
+#          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+#          source $HOME/.cargo/env
+#          rustup component add rust-src
+#
+#      - name: Install evcxr_jupyter
+#        run: |
+#          source $HOME/.cargo/env
+#          cargo install --locked evcxr_jupyter
+#          evcxr_jupyter --install
+#
+#      - name: Convert and run Jupyter Notebooks
+#        run: |
+#          for notebook in $(find . -name "*.ipynb"); do
+#            pipenv run jupyter nbconvert --to notebook --execute $notebook
+#          done
